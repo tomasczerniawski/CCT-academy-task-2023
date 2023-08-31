@@ -42,45 +42,74 @@ def find_lowest_illumination_index(road_length, non_working_lights):
 
 
 
+def find_closest_working_light_distance(non_working_light, working_lights):
+    closest_distance = float('inf')
+
+    for working_light in working_lights:
+        dist = abs(working_light - non_working_light) * 20
+        if dist < closest_distance:
+            closest_distance = dist
+    
+    return closest_distance
+
 def find_minimal_replacements(road_length, non_working_lights):
     replacements = 0
-    working_lights = set(range(0, road_length // 20 + 1))
+    working_lights = [1] * (road_length // 20 + 1)
 
-    while non_working_lights:
-        light_to_replace = None
-        max_illumination_deficit = 0
-
-        for non_working_light in non_working_lights:
-            illumination_needed = 1 - illumination(0)  # Initial illumination needed
-            for working_light in working_lights:
-                distance = abs(working_light - non_working_light) * 20
-                if distance <= 90:  # Check within 90 meters
-                    illumination_needed -= illumination(distance)
+    while True:
+        illumination_ok = True
+        
+        for idx in non_working_lights:
+            illumination_sum = 0
             
-            if illumination_needed > max_illumination_deficit:
-                light_to_replace = non_working_light
-                max_illumination_deficit = illumination_needed
-
+            for i in range(max(0, idx - 4), min(len(working_lights), idx + 5)):
+                distance = abs(idx - i) * 20
+                illumination_sum += illumination(distance) * working_lights[i]
+            
+            if illumination_sum < 0.01:
+                illumination_ok = False
+                break
+        
+        if illumination_ok:
+            break
+        
+        max_illumination_increase = -1
+        light_to_replace = None
+        
+        new_non_working_lights = []
+        
+        for idx in non_working_lights:
+            illumination_increase = 0
+            
+            for i in range(max(0, idx - 4), min(len(working_lights), idx + 5)):
+                distance = abs(idx - i) * 20
+                illumination_increase += illumination(distance) * (1 - working_lights[i])
+            
+            if illumination_increase > max_illumination_increase:
+                max_illumination_increase = illumination_increase
+                light_to_replace = idx
+            else:
+                new_non_working_lights.append(idx)
+        
         if light_to_replace is None:
             break
-
-        working_lights.add(light_to_replace)
-        non_working_lights.remove(light_to_replace)
+        
+        working_lights[light_to_replace] = 1
+        non_working_lights = new_non_working_lights
         replacements += 1
-
+        
     return replacements
 
-# Example usage
+
+# Example usage and printing
 road_length = 2000000
-non_working_lights = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]  # Example non-working light indexes
+non_working_lights = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
 minimal_replacements = find_minimal_replacements(road_length, non_working_lights)
 
 print("Minimal number of replacements to achieve cumulative illumination of at least 1:", minimal_replacements)
-
 
 
 lowest_illumination_index = find_lowest_illumination_index(road_length, non_working_lights)
 
 
 print("Index of the street light to be replaced:", lowest_illumination_index)
-
