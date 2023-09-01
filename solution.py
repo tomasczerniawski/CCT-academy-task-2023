@@ -55,16 +55,16 @@ def find_minimal_replacements(road_length, non_working_lights):
         for idx in non_working_lights:
             illumination_sum = 0
             
-            for i in range(max(0, idx - 4), min(len(working_lights), idx + 5)):
+            for i in range(len(working_lights)):
                 distance = abs(idx - i) * 20
                 illumination_value = illumination(distance) * working_lights[i]
                 illumination_sum += illumination_value
             
-            if illumination_sum < 0.01:
+            if illumination_sum < 0.01 and working_lights[idx] == 1:
                 illumination_ok = False
                 break
             
-            print(f"Non-working light {idx}: Total Illumination={illumination_sum}")
+            print(f"Non-working light {idx}: Total Illumination={illumination_sum}, Working Lights: {[i for i in range(len(working_lights)) if illumination(abs(i - idx) * 20) >= 0.01]}")
         
         if illumination_ok:
             break
@@ -77,7 +77,7 @@ def find_minimal_replacements(road_length, non_working_lights):
         for idx in non_working_lights:
             illumination_increase = 0
             
-            for i in range(max(0, idx - 4), min(len(working_lights), idx + 5)):
+            for i in range(len(working_lights)):
                 distance = abs(idx - i) * 20
                 illumination_increase += illumination(distance) * (1 - working_lights[i])
             
