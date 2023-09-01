@@ -103,3 +103,4 @@ lowest_illumination_index = find_lowest_illumination_index(road_length, non_work
 
 
 print("Index of the street light to be replaced:", lowest_illumination_index)
+
