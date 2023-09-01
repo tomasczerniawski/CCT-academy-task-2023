@@ -51,54 +51,50 @@ def find_minimal_replacements(road_length, non_working_lights):
 
     while True:
         illumination_ok = True
-        
-        for idx in non_working_lights:
-            illumination_sum = 0
-            
-            for i in range(len(working_lights)):
-                if working_lights[i] == 1:
-                    distance = abs(idx - i) * 20
+
+        # Calculate the total illumination for each broken light
+        illumination_sums = [0] * len(non_working_lights)
+
+        for i, idx in enumerate(non_working_lights):
+            for j in range(len(working_lights)):
+                if working_lights[j] == 1:
+                    distance = abs(idx - j) * 20
                     illumination_value = illumination(distance) if illumination(distance) >= 0.01 else 0
-                    illumination_sum += illumination_value
-            
-            if illumination_sum < 0.01 and working_lights[idx] == 1:
+                    illumination_sums[i] += illumination_value
+
+            # If the illumination sum for this broken light is less than 1, mark it as not okay
+            if illumination_sums[i] < 1:
                 illumination_ok = False
-                break
-            
-            print(f"Non-working light {idx}: Total Illumination={illumination_sum}, Working Lights: {[i for i in range(len(working_lights)) if illumination(abs(i - idx) * 20) >= 0.01 and working_lights[i] == 1]}")
-        
+
+            # Print information for debugging
+            print(f"Non-working light {idx}: Total Illumination={illumination_sums[i]}, Working Lights: {[i for i in range(len(working_lights)) if illumination(abs(i - idx) * 20) >= 0.01 and working_lights[i] == 1]}")
+
+        # If all broken lights have at least 1 illumination, stop the loop
         if illumination_ok:
             break
-        
-        max_illumination_increase = -1
-        light_to_replace = None
-        
-        new_non_working_lights = []
-        
-        for idx in non_working_lights:
-            illumination_increase = 0
-            
-            for i in range(len(working_lights)):
-                distance = abs(idx - i) * 20
-                illumination_increase += illumination(distance) * (1 - working_lights[i])
-            
-            if illumination_increase > max_illumination_increase:
-                max_illumination_increase = illumination_increase
-                light_to_replace = idx
-            else:
-                new_non_working_lights.append(idx)
-        
-        if light_to_replace is None:
-            break
-        
-        working_lights[light_to_replace] = 1
-        non_working_lights = new_non_working_lights
+
+        # Find the broken light that contributes the least illumination to the total
+        min_illumination_light = None
+        min_illumination_value = float('inf')
+
+        for i, illumination_sum in enumerate(illumination_sums):
+            if illumination_sum < min_illumination_value:
+                min_illumination_light = non_working_lights[i]
+                min_illumination_value = illumination_sum
+
+        # Replace the light that contributes the least illumination with a working light
+        working_lights[min_illumination_light] = 1
         replacements += 1
-        
+
+        # Print information for debugging
+        print(f"Replacing light {min_illumination_light}. Total replacements: {replacements}")
+
     return replacements
+
 # Example usage and printing
+
 road_length = 2000000
-non_working_lights = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
+non_working_lights = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,18,  19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,195]
 minimal_replacements = find_minimal_replacements(road_length, non_working_lights)
 
 print("Minimal number of replacements to achieve cumulative illumination of at least 1:", minimal_replacements)
@@ -106,5 +102,4 @@ print("Minimal number of replacements to achieve cumulative illumination of at l
 lowest_illumination_index = find_lowest_illumination_index(road_length, non_working_lights)
 
 
-print("Index of the street light to be replaced:", lowest_illumination_index)
 print("Index of the street light to be replaced:", lowest_illumination_index)
