@@ -1,5 +1,5 @@
 import math
-
+import cProfile
 def illumination(distance):
     return 3 ** (-(distance / 90) ** 2)
 
@@ -41,7 +41,9 @@ def find_lowest_illumination_index(road_length, non_working_lights):
 
 
 
-
+def calculate_illumination_values(road_length):
+    illumination_values = [illumination(i * 20) if illumination(i * 20) >= 0.01 else 0 for i in range(road_length // 20 + 1)]
+    return illumination_values
 
 def find_minimal_replacements(road_length, non_working_lights, show_process=False):
     replacements = 0
@@ -49,6 +51,8 @@ def find_minimal_replacements(road_length, non_working_lights, show_process=Fals
 
     for non_working_light in non_working_lights:
         working_lights[non_working_light] = 0  # Mark non-working light as not working
+
+    illumination_values = calculate_illumination_values(road_length)
 
     while True:
         illumination_ok = True
@@ -59,9 +63,7 @@ def find_minimal_replacements(road_length, non_working_lights, show_process=Fals
         for i, idx in enumerate(non_working_lights):
             for j in range(len(working_lights)):
                 if working_lights[j] == 1:
-                    distance = abs(idx - j) * 20
-                    illumination_value = illumination(distance) if illumination(distance) >= 0.01 else 0
-                    illumination_sums[i] += illumination_value
+                    illumination_sums[i] += illumination_values[abs(idx - j)]
 
             # If the illumination sum for this broken light is less than 1, mark it as not okay
             if illumination_sums[i] < 1:
@@ -70,7 +72,7 @@ def find_minimal_replacements(road_length, non_working_lights, show_process=Fals
             # Print information for debugging if show_process is True
             if show_process:
                 light_status = "NOW Working" if working_lights[idx] == 1 else "Non-working"
-                print(f"{light_status} light {idx}: Total Illumination={illumination_sums[i]}, Working Lights: {[i for i in range(len(working_lights)) if illumination(abs(i - idx) * 20) >= 0.01 and working_lights[i] == 1]}")
+                print(f"{light_status} light {idx}: Total Illumination={illumination_sums[i]}, Working Lights: {[i for i in range(len(working_lights)) if illumination_values[abs(i - idx)] >= 0.01 and working_lights[i] == 1]}")
 
         # If all broken lights have at least 1 illumination, stop the loop
         if illumination_ok:
@@ -115,8 +117,6 @@ user_choice = input("Do you want to see the process (yes/no)? ").strip().lower()
 if user_choice == "yes":
     minimal_replacements = find_minimal_replacements(road_length, non_working_lights, show_process=True)
 
-
 lowest_illumination_index = find_lowest_illumination_index(road_length, non_working_lights)
-
 
 print("Index of the street light to be replaced:", lowest_illumination_index)
