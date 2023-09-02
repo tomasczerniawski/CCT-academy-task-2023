@@ -68,7 +68,8 @@ def find_minimal_replacements(road_length, non_working_lights, show_process=Fals
 
             # Print information for debugging if show_process is True
             if show_process:
-                print(f"Non-working light {idx}: Total Illumination={illumination_sums[i]}, Working Lights: {[i for i in range(len(working_lights)) if illumination(abs(i - idx) * 20) >= 0.01 and working_lights[i] == 1]}")
+                light_status = "NOW Working" if working_lights[idx] == 1 else "Non-working"
+                print(f"{light_status} light {idx}: Total Illumination={illumination_sums[i]}, Working Lights: {[i for i in range(len(working_lights)) if illumination(abs(i - idx) * 20) >= 0.01 and working_lights[i] == 1]}")
 
         # If all broken lights have at least 1 illumination, stop the loop
         if illumination_ok:
@@ -89,8 +90,15 @@ def find_minimal_replacements(road_length, non_working_lights, show_process=Fals
 
         # Print information for debugging if show_process is True
         if show_process:
-            print(f"Replacing light {min_illumination_light}. Total replacements: {replacements}")
-
+            if illumination_sums[min_illumination_light] >= 1:
+                light_status = "Now Working"
+            else:
+                light_status = "Replacing"
+                
+            print()
+            print(f"{light_status} light {min_illumination_light}. Total replacements: {replacements}")
+            print()
+            
     return replacements
 
 # Example usage and printing
@@ -104,8 +112,7 @@ print("Minimal number of replacements to achieve cumulative illumination of at l
 # Ask the user if they want to see the process prints
 user_choice = input("Do you want to see the process (yes/no)? ").strip().lower()
 if user_choice == "yes":
-    minimal_replacements = find_minimal_replacements(road_length, non_working_lights, show_process=True)
-
+    find_minimal_replacements(road_length, non_working_lights, show_process=True)
 
 lowest_illumination_index = find_lowest_illumination_index(road_length, non_working_lights)
 
