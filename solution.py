@@ -1,5 +1,5 @@
 import math
-import cProfile
+
 def illumination(distance):
     return 3 ** (-(distance / 90) ** 2)
 
@@ -35,11 +35,6 @@ def find_lowest_illumination_index(road_length, non_working_lights):
             min_index = non_working_light
     
     return min_index
-
-
-
-
-
 
 def calculate_illumination_values(road_length):
     illumination_values = [illumination(i * 20) if illumination(i * 20) >= 0.01 else 0 for i in range(road_length // 20 + 1)]
@@ -107,7 +102,7 @@ def find_minimal_replacements(road_length, non_working_lights, show_process=Fals
 # Example usage and printing
 
 road_length = 2000000
-non_working_lights = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 195]
+non_working_lights = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 40,41,42,43,45,46,47,48,49,50,51]
 minimal_replacements = find_minimal_replacements(road_length, non_working_lights)
 
 print("Minimal number of replacements to achieve cumulative illumination of at least 1:", minimal_replacements)
