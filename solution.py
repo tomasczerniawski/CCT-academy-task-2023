@@ -42,6 +42,7 @@ def find_lowest_illumination_index(road_length, non_working_lights):
 
 
 
+
 def find_minimal_replacements(road_length, non_working_lights, show_process=False):
     replacements = 0
     working_lights = [1] * (road_length // 20 + 1)  # Assume all lights are initially working
@@ -112,7 +113,8 @@ print("Minimal number of replacements to achieve cumulative illumination of at l
 # Ask the user if they want to see the process prints
 user_choice = input("Do you want to see the process (yes/no)? ").strip().lower()
 if user_choice == "yes":
-    find_minimal_replacements(road_length, non_working_lights, show_process=True)
+    minimal_replacements = find_minimal_replacements(road_length, non_working_lights, show_process=True)
+
 
 lowest_illumination_index = find_lowest_illumination_index(road_length, non_working_lights)
 
