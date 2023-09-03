@@ -1,1 +1,0 @@
-# CCT-academy-task-2023
