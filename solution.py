@@ -52,66 +52,72 @@ def find_minimal_replacements(road_length, non_working_lights, show_process=Fals
     while True:
         illumination_ok = True
 
-        # Calculate the total illumination for each broken light
-        illumination_sums = [0] * len(non_working_lights)
+        # Calculate the total illumination for each broken light using a dictionary
+        illumination_sums = {}
 
-        for i, idx in enumerate(non_working_lights):
-            for j in range(len(working_lights)):
-                if working_lights[j] == 1:
-                    illumination_sums[i] += illumination_values[abs(idx - j)]
+        for idx in non_working_lights:
+            illumination_sums[idx] = 0
 
-            # If the illumination sum for this broken light is less than 1, mark it as not okay
-            if illumination_sums[i] < 1:
+        for j in range(len(working_lights)):
+            if working_lights[j] == 1:
+                for idx in non_working_lights:
+                    illumination_sums[idx] += illumination_values[abs(idx - j)]
+
+        # Check if the illumination sum for each broken light is less than 1
+        for idx in non_working_lights:
+            if illumination_sums[idx] < 1:
                 illumination_ok = False
 
-            # Print information for debugging if show_process is True
+            # Print information if show_process is True
             if show_process:
-                light_status = "NOW Working" if working_lights[idx] == 1 else "Non-working"
-                print(f"{light_status} light {idx}: Total Illumination={illumination_sums[i]}, Working Lights: {[i for i in range(len(working_lights)) if illumination_values[abs(i - idx)] >= 0.01 and working_lights[i] == 1]}")
+                light_status = "REPLACED" if working_lights[idx] == 1 else "Non-working"
+                print(f"{light_status} light {idx}: Total Illumination={illumination_sums[idx]}, Working Lights: {[i for i in range(len(working_lights)) if illumination_values[abs(i - idx)] >= 0.01 and working_lights[i] == 1]}")
 
         # If all broken lights have at least 1 illumination, stop the loop
         if illumination_ok:
             break
 
-        # Find the broken light that contributes the least illumination to the total
+        # Find the broken light
         min_illumination_light = None
         min_illumination_value = float('inf')
 
-        for i, illumination_sum in enumerate(illumination_sums):
-            if illumination_sum < min_illumination_value:
-                min_illumination_light = non_working_lights[i]
-                min_illumination_value = illumination_sum
+        for idx in non_working_lights:
+            if illumination_sums[idx] < min_illumination_value:
+                min_illumination_light = idx
+                min_illumination_value = illumination_sums[idx]
 
-        # Replace the light that contributes the least illumination with a working light
-        working_lights[min_illumination_light] = 1
-        replacements += 1
+        # Check if min_illumination_light is a valid index before accessing illumination_sums
+        if min_illumination_light is not None and min_illumination_light in illumination_sums:
+            # Replace the broken light
+            working_lights[min_illumination_light] = 1
+            replacements += 1
 
-        # Print information for debugging if show_process is True
-        if show_process:
-            if illumination_sums[min_illumination_light] >= 1:
-                light_status = "Now Working"
-            else:
-                light_status = "Replacing"
-                
-            print()
-            print(f"{light_status} light {min_illumination_light}. Total replacements: {replacements}")
-            print()
+            # Print information for debugging if show_process is True
+            if show_process:
+                if illumination_sums[min_illumination_light] >= 1:
+                    light_status = "Now Working"
+                else:
+                    light_status = "Replacing"
+
+                print()
+                print(f"{light_status} light {min_illumination_light}. Total replacements: {replacements}")
+                print()
             
     return replacements
 
 # Example usage and printing
 
 road_length = 2000000
-non_working_lights = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 40,41,42,43,45,46,47,48,49,50,51]
+non_working_lights = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 40, 41, 42, 43, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62]
 minimal_replacements = find_minimal_replacements(road_length, non_working_lights)
 
 print("Minimal number of replacements to achieve cumulative illumination of at least 1:", minimal_replacements)
 
-# Ask the user if they want to see the process prints
+lowest_illumination_index = find_lowest_illumination_index(road_length, non_working_lights)
+
+print("Index of the street light to be replaced:", lowest_illumination_index)
+
 user_choice = input("Do you want to see the process (yes/no)? ").strip().lower()
 if user_choice == "yes":
     minimal_replacements = find_minimal_replacements(road_length, non_working_lights, show_process=True)
 
-lowest_illumination_index = find_lowest_illumination_index(road_length, non_working_lights)
-
-print("Index of the street light to be replaced:", lowest_illumination_index)
