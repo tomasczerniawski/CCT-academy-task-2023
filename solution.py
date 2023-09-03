@@ -120,4 +120,3 @@ print("Index of the street light to be replaced:", lowest_illumination_index)
 user_choice = input("Do you want to see the process (yes/no)? ").strip().lower()
 if user_choice == "yes":
     minimal_replacements = find_minimal_replacements(road_length, non_working_lights, show_process=True)
-
